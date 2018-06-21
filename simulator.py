@@ -3,32 +3,53 @@ import time
 
 class Simulator(object):
 
-    def __init__(self, env, agent, initial_state):
+    def __init__(self, env, agent, do_print=False):
         self.env = env
         self.agent = agent
         self.rep = None
-        self.initial_state = initial_state
+        self.indexer = 0
+        self.do_print = do_print
 
-    def run(self, episodes=100, pause=0.0):
+    def run(self, episodes=100, pause=0.0, max_moves=100):
         for i in range(episodes):
             print("-- Episode {} --\n".format(i + 1))
-            self.episode(pause)
+            self.episode(pause, max_moves)
+            self.agent.update_utilities(i+1, self.indexer)
 
-    def episode(self, pause=0.0):
-        self.agent.state = self.initial_state
-        while not self.agent.done():
-            print(self)
-            time.sleep(pause)
-            self.agent.act()
+    def episode(self, pause, max_moves):
+        self.agent.reset(self.env.model.random())
+        self.printout(pause)
+
+        count = 0
+        while not self.agent.done() and count < max_moves:
+            self.agent.update_rewards()
+            action = self.agent.action(
+                        self.env.available_actions(self.agent.state))
+            self.agent.set_state(self.env.transition(
+                    self.agent.state, action))
+            count += 1
+            self.printout(pause, action)
+
+        self.agent.update_rewards()
+
+
+    def printout(self, pause, action=None):
+        if not self.do_print:
+            return
+        print("s =", self.agent.state)
+        if action is not None:
+            print("a =", action)
         print(self)
-        time.sleep(pause)
+        if pause > 0:
+            time.sleep(pause)
 
 
 class GridWorldSimulator(Simulator):
 
-    def __init__(self, env, agent, initial_state):
-        super().__init__(env, agent, initial_state)
-        self.rep = self.env.grid
+    def __init__(self, env, agent):
+        super().__init__(env, agent)
+        self.rep = self.env.model
+        self.indexer = self.rep.pmax.x
 
     def __repr__(self):
         result = ""

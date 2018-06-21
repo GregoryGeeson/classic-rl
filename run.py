@@ -1,7 +1,8 @@
-from state import Cell
+from state import Cell, CellGrid2D
 from agent import PassiveGridNavigator
-from environment import GridWorld, CellGrid2D
+from environment import GridWorld
 from simulator import GridWorldSimulator
+import random
 
 
 xsize = 4
@@ -23,16 +24,19 @@ def main():
     env.set_cell(trap, terminal=True, reward=r_trap)
     env.set_cell(Cell(1, 1), accessible=False)
 
-    policy = CellGrid2D([
+    policy = CellGrid2D([ # optimal for standard 4x3 world
             Cell( 0, 1), Cell(0, 1), Cell(1, 0),
             Cell(-1, 0), Cell(0, 0), Cell(1, 0),
             Cell(-1, 0), Cell(0, 1), Cell(1, 0),
             Cell(-1, 0), Cell(0, 0), Cell(0, 0)
             ], Cell(0, 0), Cell(xsize-1, ysize-1))
-    agent = PassiveGridNavigator(env, policy)
 
-    sim = GridWorldSimulator(env, agent, Cell(3, 0))
-    sim.run(episodes=2, pause=1.0)
+    policy = [None] * xsize * ysize # indicates random online policy
+
+    agent = PassiveGridNavigator(policy)
+
+    sim = GridWorldSimulator(env, agent)
+    sim.run(episodes=100, pause=0.0, max_moves=100)
 
 
 if __name__ == '__main__':
