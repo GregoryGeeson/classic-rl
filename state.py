@@ -26,11 +26,14 @@ class Cell(State):
     def __sub__(self, c):
         return Cell(self.x - c.x, self.y - c.y)
 
-    def mul(self, k):
-        return Cell(k * self.x, k * self.y)
+    def __hash__(self):
+        return hash((self.x, self.y))
 
     def __repr__(self):
         return "Cell({}, {})".format(self.x, self.y)
+
+    def mul(self, k):
+        return Cell(k * self.x, k * self.y)
 
 
 class CellGrid2D(object):
@@ -67,3 +70,10 @@ class CellGrid2D(object):
         while state.terminal or not state.accessible:
             state = random.choice(self.grid)
         return state
+
+
+if __name__ == '__main__':
+    d = {(Cell(0, 0), Cell(0, 1)) : 0.04, (Cell(1, 1), Cell(-1, 0)) : 0.5}
+    print(d.get((Cell(0, 0), Cell(0, 1))))
+    print(d.get((Cell(1, 1), Cell(-1, 0))))
+    

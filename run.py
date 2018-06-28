@@ -1,5 +1,5 @@
 from state import Cell, CellGrid2D
-from agent import PassiveGridNavigator
+from agent import *
 from environment import GridWorld
 from simulator import GridWorldSimulator
 import random
@@ -25,17 +25,19 @@ def main():
     env.set_cell(Cell(1, 1), accessible=False)
 
     policy = CellGrid2D([ # optimal for standard 4x3 world
-            Cell( 0, 1), Cell(0, 1), Cell(1, 0),
-            Cell(-1, 0), Cell(0, 0), Cell(1, 0),
-            Cell(-1, 0), Cell(0, 1), Cell(1, 0),
-            Cell(-1, 0), Cell(0, 0), Cell(0, 0)
+            env.U, env.U, env.R,
+            env.L, env.N, env.R,
+            env.L, env.U, env.R,
+            env.L, env.N, env.N
             ], Cell(0, 0), Cell(xsize-1, ysize-1))
 
-    policy = [None] * xsize * ysize # indicates random online policy
+    # policy = [None] * xsize * ysize # indicates random online policy
 
-    agent = PassiveGridNavigator(policy)
+    # agent = DirectLearner(policy, discount=1.0)
+    # agent = TemporalDifferenceLearner(policy, discount=1.0)
+    agent = ADPLearner(policy, discount=1.0)
 
-    sim = GridWorldSimulator(env, agent)
+    sim = GridWorldSimulator(env, agent, do_print=True)
     sim.run(episodes=100, pause=0.0, max_moves=100)
 
 

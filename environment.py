@@ -15,6 +15,12 @@ class Environment(object):
 
 class GridWorld(Environment):
 
+    R = Cell(1, 0)
+    U = Cell(0, 1)
+    L = Cell(-1, 0)
+    D = Cell(0, -1)
+    N = Cell(0, 0)
+
     def __init__(self, pmin, pmax):
         """
         Constructor.
